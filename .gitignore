@@ -1,0 +1,15 @@
+*.iml
+.gradle/
+.idea/
+local.properties
+.DS_Store
+build/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+.agent/
+.agents/
+.claude/
+.codex/
+skills-lock.json

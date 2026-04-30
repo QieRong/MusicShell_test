@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Musicshell" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/musicshell_primary</item>
+        <item name="colorOnPrimary">@color/musicshell_on_primary</item>
+        <item name="colorPrimaryContainer">@color/musicshell_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/musicshell_on_primary_container</item>
+        <item name="colorSecondary">@color/musicshell_secondary</item>
+        <item name="colorOnSecondary">@color/musicshell_on_secondary</item>
+        <item name="colorSurface">@color/musicshell_surface</item>
+        <item name="colorOnSurface">@color/musicshell_on_surface</item>
+        <item name="colorSurfaceVariant">@color/musicshell_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/musicshell_on_surface_variant</item>
+        <item name="colorOutline">@color/musicshell_outline</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">@color/musicshell_surface</item>
+        <item name="android:navigationBarColor">@color/musicshell_surface</item>
+    </style>
+</resources>

@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">MusicShell</string>
+    <string name="home_title">本地音乐，从你的设备开始</string>
+    <string name="home_subtitle">MusicShell 只管理和播放你手机里已有的音频文件。它不内置音乐内容，不连接商业音乐平台，也不上传你的数据。</string>
+    <string name="empty_state_title">还没有扫描本地音乐</string>
+    <string name="empty_state_body">下一步会接入系统媒体库读取本地音频。当前版本先保留合规入口，确保协议、主题和数据边界清晰。</string>
+    <string name="scan_local_music">扫描本地音乐</string>
+    <string name="scan_music_next_step">本地音乐扫描将在下一步接入。</string>
+    <string name="about_and_disclaimer">关于与免责声明</string>
+    <string name="privacy_hint">隐私边界：当前页面不申请权限，不上传数据，不写入公共目录。</string>
+    <string name="agreement_title">学习研究协议与版权警告</string>
+    <string name="agreement_full_text">MusicShell 是一个个人学习用途的本地音乐文件管理与播放工具，本身不提供、推荐、分发或托管任何音乐内容。\n\n请仅使用你合法拥有或已获得授权的本地音频文件。若未来你主动导入脚本或连接私有资源，请自行确认相关内容来源合法，并自行承担使用责任。\n\n本 App 不内置商业音乐平台接口，不绕过任何 DRM 或加密保护，不上传你的音乐文件、播放记录或个人数据。\n\n点击“我已阅读并同意”表示你理解并同意以上内容。</string>
+    <string name="agreement_accept">我已阅读并同意</string>
+    <string name="exit_app">退出</string>
+    <string name="about_title">关于 MusicShell</string>
+    <string name="about_body">MusicShell 是一个纯粹的本地音乐工具。当前阶段只提供合规入口与基础首页，后续功能会围绕本地扫描、浏览与播放逐步实现。</string>
+    <string name="dialog_confirm">知道了</string>
+</resources>

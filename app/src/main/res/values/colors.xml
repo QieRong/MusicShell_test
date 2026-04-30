@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="musicshell_primary">#216F55</color>
+    <color name="musicshell_on_primary">#FFFFFFFF</color>
+    <color name="musicshell_primary_container">#D7F5E6</color>
+    <color name="musicshell_on_primary_container">#062117</color>
+    <color name="musicshell_secondary">#4B6358</color>
+    <color name="musicshell_on_secondary">#FFFFFFFF</color>
+    <color name="musicshell_surface">#FBFDF9</color>
+    <color name="musicshell_on_surface">#171D1A</color>
+    <color name="musicshell_surface_variant">#EEF2EC</color>
+    <color name="musicshell_on_surface_variant">#45504A</color>
+    <color name="musicshell_outline">#C4CCC5</color>
+</resources>
