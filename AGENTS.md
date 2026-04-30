@@ -156,9 +156,11 @@ MusicShell 是一个"空壳"——它本身不包含任何音乐内容。
 
 - 只申请以下权限：
   - `android.permission.READ_MEDIA_AUDIO`（读取本地音频文件）
+  - `android.permission.READ_EXTERNAL_STORAGE`（仅用于 Android 12 及以下读取本地音频，必须设置 `android:maxSdkVersion="32"`）
   - `android.permission.INTERNET`（用户主动触发的网络请求）
   - `android.permission.FOREGROUND_SERVICE`（后台音乐播放）
 - **不申请**：定位、通讯录、电话、短信、摄像头、身体传感器等
+- 当项目规范与 Android 平台实际兼容性要求冲突时，以平台实际行为为准，并同步修正本文档后告知用户。
 
 ### 4.5 卸载残留
 
