@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 本地音乐播放控制器。
@@ -16,7 +18,9 @@ import java.io.IOException;
  * <p>基于系统 {@link MediaPlayer}，封装播放、暂停、切换歌曲等操作。
  * 使用 {@link MediaPlayer#prepareAsync()} 异步准备，避免阻塞 UI 线程。</p>
  *
- * <p>生命周期：Activity 创建时初始化，.onDestroy() 时必须调用 {@link #release()} 释放资源。</p>
+ * <p>支持播放列表管理、上一首/下一首切换、进度查询与跳转。</p>
+ *
+ * <p>生命周期：Activity 创建时初始化，onDestroy() 时必须调用 {@link #release()} 释放资源。</p>
  */
 public class MusicPlayerController {
 
@@ -32,6 +36,8 @@ public class MusicPlayerController {
         void onPlaybackStopped();
         /** 播放出错时回调 */
         void onPlaybackError(@NonNull LocalAudioTrack track, @NonNull String errorMessage);
+        /** 歌曲自动切换（上一首/下一首）时回调 */
+        void onTrackChanged(@NonNull LocalAudioTrack track);
     }
 
     @NonNull
@@ -44,6 +50,12 @@ public class MusicPlayerController {
     @Nullable
     private PlaybackCallback callback;
 
+    /** 当前播放列表 */
+    @NonNull
+    private List<LocalAudioTrack> playlist = new ArrayList<>();
+    /** 当前播放索引，-1 表示无歌曲 */
+    private int currentIndex = -1;
+
     public MusicPlayerController(@NonNull Context context) {
         this.context = context.getApplicationContext();
     }
@@ -53,6 +65,22 @@ public class MusicPlayerController {
      */
     public void setCallback(@Nullable PlaybackCallback callback) {
         this.callback = callback;
+    }
+
+    /**
+     * 设置播放列表并记录当前播放歌曲的索引。
+     *
+     * @param tracks 播放列表
+     */
+    public void setPlaylist(@NonNull List<LocalAudioTrack> tracks) {
+        this.playlist.clear();
+        this.playlist.addAll(tracks);
+        // 如果当前有歌曲在播放，更新索引
+        if (currentTrack != null) {
+            this.currentIndex = findTrackIndex(currentTrack.getId());
+        } else {
+            this.currentIndex = -1;
+        }
     }
 
     /**
@@ -68,6 +96,49 @@ public class MusicPlayerController {
      */
     public boolean isPlaying() {
         return mediaPlayer != null && isPrepared && mediaPlayer.isPlaying();
+    }
+
+    /**
+     * 获取当前播放位置（毫秒）。未播放时返回 0。
+     */
+    public int getCurrentPosition() {
+        if (mediaPlayer != null && isPrepared) {
+            try {
+                return mediaPlayer.getCurrentPosition();
+            } catch (IllegalStateException ignored) {
+                // 播放器状态异常时返回 0
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * 获取当前歌曲总时长（毫秒）。未播放时返回 0。
+     */
+    public int getDuration() {
+        if (mediaPlayer != null && isPrepared) {
+            try {
+                return mediaPlayer.getDuration();
+            } catch (IllegalStateException ignored) {
+                // 播放器状态异常时返回 0
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * 跳转到指定位置（毫秒）。
+     *
+     * @param positionMs 目标位置（毫秒）
+     */
+    public void seekTo(int positionMs) {
+        if (mediaPlayer != null && isPrepared) {
+            try {
+                mediaPlayer.seekTo(positionMs);
+            } catch (IllegalStateException ignored) {
+                // 忽略异常
+            }
+        }
     }
 
     /**
@@ -87,7 +158,57 @@ public class MusicPlayerController {
 
         // 切换到新歌曲，释放旧实例后播放
         releasePlayer();
+        currentIndex = findTrackIndex(track.getId());
         startPlayback(track);
+    }
+
+    /**
+     * 播放上一首。
+     *
+     * <p>边界处理：第一首歌时循环到最后一首。</p>
+     */
+    public void playPrevious() {
+        if (playlist.isEmpty()) {
+            return;
+        }
+
+        int newIndex;
+        if (currentIndex <= 0) {
+            // 已是第一首，循环到最后一首
+            newIndex = playlist.size() - 1;
+        } else {
+            newIndex = currentIndex - 1;
+        }
+
+        playAtIndex(newIndex);
+    }
+
+    /**
+     * 播放下一首。
+     *
+     * <p>边界处理：最后一首歌时循环到第一首。</p>
+     */
+    public void playNext() {
+        if (playlist.isEmpty()) {
+            return;
+        }
+
+        int newIndex;
+        if (currentIndex >= playlist.size() - 1) {
+            // 已是最后一首，循环到第一首
+            newIndex = 0;
+        } else {
+            newIndex = currentIndex + 1;
+        }
+
+        playAtIndex(newIndex);
+    }
+
+    /**
+     * 获取播放列表大小。
+     */
+    public int getPlaylistSize() {
+        return playlist.size();
     }
 
     /**
@@ -120,6 +241,40 @@ public class MusicPlayerController {
     public void release() {
         releasePlayer();
         callback = null;
+    }
+
+    /**
+     * 根据索引播放歌曲，释放旧实例后播放新歌曲。
+     */
+    private void playAtIndex(int index) {
+        if (index < 0 || index >= playlist.size()) {
+            return;
+        }
+
+        currentIndex = index;
+        LocalAudioTrack track = playlist.get(index);
+        releasePlayer();
+        startPlayback(track);
+
+        // 通知歌曲切换
+        if (callback != null) {
+            callback.onTrackChanged(track);
+        }
+    }
+
+    /**
+     * 查找歌曲在播放列表中的索引。
+     *
+     * @param trackId 歌曲 ID
+     * @return 索引，未找到返回 -1
+     */
+    private int findTrackIndex(long trackId) {
+        for (int i = 0; i < playlist.size(); i++) {
+            if (playlist.get(i).getId() == trackId) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -156,10 +311,11 @@ public class MusicPlayerController {
         });
 
         mediaPlayer.setOnCompletionListener(mp -> {
-            // 播放完成，通知停止状态
+            // 播放完成，自动播放下一首
             if (callback != null) {
                 callback.onPlaybackStopped();
             }
+            playNext();
         });
 
         mediaPlayer.setOnErrorListener((mp, what, extra) -> {

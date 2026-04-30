@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,13 +32,15 @@ import java.util.concurrent.Executors;
  * MusicShell 的主入口。
  *
  * <p>负责首次启动协议、本地音频读取权限和当前阶段的本地音乐扫描展示。
- * 集成播放器控制器，实现点击歌曲播放/暂停的最小闭环。</p>
+ * 集成播放器控制器，实现点击歌曲播放/暂停、进度条、上一首/下一首功能。</p>
  */
 public class MainActivity extends AppCompatActivity implements MusicPlayerController.PlaybackCallback {
 
     private static final String PREFS_NAME = "musicshell_prefs";
     private static final String KEY_AGREEMENT_ACCEPTED = "agreement_accepted";
     private static final int REQUEST_AUDIO_PERMISSION = 1001;
+    /** 进度更新间隔（毫秒） */
+    private static final int PROGRESS_UPDATE_INTERVAL = 500;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService scanExecutor = Executors.newSingleThreadExecutor();
@@ -50,10 +53,29 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
     private ListView audioListView;
     private LocalAudioAdapter audioAdapter;
     private MusicPlayerController playerController;
+
+    // 迷你播放栏视图
     private MaterialCardView miniPlayerCard;
     private TextView miniPlayerTitle;
     private TextView miniPlayerArtist;
     private MaterialButton miniPlayerPlayPauseButton;
+    private MaterialButton miniPlayerPreviousButton;
+    private MaterialButton miniPlayerNextButton;
+    private SeekBar miniPlayerSeekBar;
+    private TextView miniPlayerCurrentTime;
+    private TextView miniPlayerTotalTime;
+
+    /** 进度更新定时器 */
+    private final Handler progressHandler = new Handler(Looper.getMainLooper());
+    private final Runnable progressRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateProgress();
+            progressHandler.postDelayed(this, PROGRESS_UPDATE_INTERVAL);
+        }
+    };
+    /** 用户是否正在拖动 SeekBar */
+    private boolean isUserSeeking = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
 
     @Override
     protected void onDestroy() {
+        // 停止进度更新定时器
+        progressHandler.removeCallbacks(progressRunnable);
         if (playerController != null) {
             playerController.release();
         }
@@ -112,6 +136,11 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
         miniPlayerTitle = findViewById(R.id.text_mini_player_title);
         miniPlayerArtist = findViewById(R.id.text_mini_player_artist);
         miniPlayerPlayPauseButton = findViewById(R.id.button_mini_player_play_pause);
+        miniPlayerPreviousButton = findViewById(R.id.button_mini_player_previous);
+        miniPlayerNextButton = findViewById(R.id.button_mini_player_next);
+        miniPlayerSeekBar = findViewById(R.id.seekbar_mini_player);
+        miniPlayerCurrentTime = findViewById(R.id.text_mini_player_current_time);
+        miniPlayerTotalTime = findViewById(R.id.text_mini_player_total_time);
     }
 
     private void bindHomeActions() {
@@ -134,6 +163,48 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
                 if (currentTrack != null) {
                     playerController.playOrPause(currentTrack);
                 }
+            }
+        });
+
+        // 上一首按钮
+        miniPlayerPreviousButton.setOnClickListener(view -> {
+            if (playerController != null) {
+                playerController.playPrevious();
+            }
+        });
+
+        // 下一首按钮
+        miniPlayerNextButton.setOnClickListener(view -> {
+            if (playerController != null) {
+                playerController.playNext();
+            }
+        });
+
+        // SeekBar 拖动监听
+        miniPlayerSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // 用户开始拖动，暂停进度更新
+                isUserSeeking = true;
+                progressHandler.removeCallbacks(progressRunnable);
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // 拖动时实时更新时间显示
+                if (fromUser) {
+                    miniPlayerCurrentTime.setText(formatTime(progress));
+                }
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // 用户松手，跳转到指定位置并恢复进度更新
+                isUserSeeking = false;
+                if (playerController != null) {
+                    playerController.seekTo(seekBar.getProgress());
+                }
+                progressHandler.post(progressRunnable);
             }
         });
     }
@@ -181,6 +252,11 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
         scanButton.setEnabled(true);
         scanProgress.setVisibility(View.GONE);
         audioAdapter.submitList(tracks);
+
+        // 设置播放列表
+        if (playerController != null) {
+            playerController.setPlaylist(tracks);
+        }
 
         if (tracks.isEmpty()) {
             audioListView.setVisibility(View.GONE);
@@ -239,17 +315,23 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
     public void onPlaybackStarted(@NonNull LocalAudioTrack track) {
         updateMiniPlayerState(track, true);
         audioAdapter.setCurrentPlayingTrackId(track.getId());
+        // 启动进度更新定时器
+        progressHandler.post(progressRunnable);
     }
 
     @Override
     public void onPlaybackPaused(@NonNull LocalAudioTrack track) {
         updateMiniPlayerState(track, false);
+        // 停止进度更新定时器
+        progressHandler.removeCallbacks(progressRunnable);
     }
 
     @Override
     public void onPlaybackStopped() {
         hideMiniPlayer();
         audioAdapter.setCurrentPlayingTrackId(-1);
+        // 停止进度更新定时器
+        progressHandler.removeCallbacks(progressRunnable);
     }
 
     @Override
@@ -257,6 +339,19 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
         hideMiniPlayer();
         audioAdapter.setCurrentPlayingTrackId(-1);
         showPlaybackError(errorMessage);
+        // 停止进度更新定时器
+        progressHandler.removeCallbacks(progressRunnable);
+    }
+
+    @Override
+    public void onTrackChanged(@NonNull LocalAudioTrack track) {
+        // 歌曲自动切换（上一首/下一首）时刷新 UI
+        updateMiniPlayerState(track, true);
+        audioAdapter.setCurrentPlayingTrackId(track.getId());
+        // 重置 SeekBar 和时间显示
+        resetProgress();
+        // 启动进度更新定时器
+        progressHandler.post(progressRunnable);
     }
 
     // ========== 迷你播放栏状态管理 ==========
@@ -273,6 +368,9 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
         miniPlayerArtist.setText(track.getArtist());
         miniPlayerPlayPauseButton.setIconResource(
                 isPlaying ? R.drawable.ic_pause : R.drawable.ic_play_arrow);
+
+        // 更新按钮状态
+        updateButtonStates();
     }
 
     /**
@@ -291,5 +389,73 @@ public class MainActivity extends AppCompatActivity implements MusicPlayerContro
                 .setMessage(getString(R.string.playback_error, errorMessage))
                 .setPositiveButton(R.string.dialog_confirm, null)
                 .show();
+    }
+
+    /**
+     * 更新进度条和时间显示。
+     */
+    private void updateProgress() {
+        if (playerController == null || isUserSeeking) {
+            return;
+        }
+
+        int currentPosition = playerController.getCurrentPosition();
+        int duration = playerController.getDuration();
+
+        // 更新 SeekBar
+        miniPlayerSeekBar.setMax(duration);
+        miniPlayerSeekBar.setProgress(currentPosition);
+
+        // 更新时间显示
+        miniPlayerCurrentTime.setText(formatTime(currentPosition));
+        miniPlayerTotalTime.setText(formatTime(duration));
+    }
+
+    /**
+     * 重置进度条和时间显示（切歌时调用）。
+     */
+    private void resetProgress() {
+        miniPlayerSeekBar.setProgress(0);
+        miniPlayerCurrentTime.setText(formatTime(0));
+        // 总时长在下一次 updateProgress 时更新
+    }
+
+    /**
+     * 更新按钮状态（上一首/下一首/播放暂停）。
+     *
+     * <p>规则：
+     * - 播放列表为空时，三按钮全部禁用
+     * - 播放列表只有一首时，上一首/下一首禁用
+     * - 暂停状态下，上一首/下一首仍可用</p>
+     */
+    private void updateButtonStates() {
+        if (playerController == null) {
+            return;
+        }
+
+        int playlistSize = playerController.getPlaylistSize();
+        boolean hasPlaylist = playlistSize > 0;
+        boolean hasMultipleTracks = playlistSize > 1;
+
+        // 上一首/下一首：列表不为空且有多首歌时可用
+        miniPlayerPreviousButton.setEnabled(hasMultipleTracks);
+        miniPlayerNextButton.setEnabled(hasMultipleTracks);
+
+        // 播放/暂停：列表不为空时可用
+        miniPlayerPlayPauseButton.setEnabled(hasPlaylist);
+    }
+
+    /**
+     * 格式化时间（毫秒转为 m:ss 格式）。
+     *
+     * @param millis 毫秒数
+     * @return 格式化后的时间字符串
+     */
+    @NonNull
+    private String formatTime(int millis) {
+        int totalSeconds = Math.max(0, millis / 1000);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%d:%02d", minutes, seconds);
     }
 }
