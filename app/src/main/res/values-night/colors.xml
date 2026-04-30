@@ -11,4 +11,6 @@
     <color name="musicshell_surface_variant">#1C241F</color>
     <color name="musicshell_on_surface_variant">#C4CCC5</color>
     <color name="musicshell_outline">#556159</color>
+    <color name="player_highlight">#8BF7C2</color>
+    <color name="item_title">#E2E8E2</color>
 </resources>

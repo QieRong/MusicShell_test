@@ -22,4 +22,9 @@
     <string name="about_title">关于 MusicShell</string>
     <string name="about_body">MusicShell 是一个纯粹的本地音乐工具。当前阶段只提供合规入口与基础首页，后续功能会围绕本地扫描、浏览与播放逐步实现。</string>
     <string name="dialog_confirm">知道了</string>
+    <string name="play_pause">播放/暂停</string>
+    <string name="mini_player_default_title">未在播放</string>
+    <string name="mini_player_default_artist">点击歌曲开始播放</string>
+    <string name="playback_error">播放出错：%1$s</string>
+    <string name="playback_error_title">播放错误</string>
 </resources>
