@@ -45,6 +45,7 @@ alwaysApply: true
 * `rm -rf` 删除非空目录。
 * `git reset --hard` 或任何丢弃未提交代码的操作。
 * 任何涉及修改、删除 `.env` 配置及数据库原始脚本的操作。
+* github上传的时候要记录每一次上传的版本和时间，并写入到项目根目录的README.md中。
 
 # MusicShell 项目宪法
 
