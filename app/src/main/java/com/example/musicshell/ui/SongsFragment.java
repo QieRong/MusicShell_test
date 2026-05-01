@@ -1,9 +1,13 @@
 package com.example.musicshell.ui;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -20,12 +24,15 @@ import java.util.List;
 /**
  * 歌曲列表 Fragment。
  *
- * <p>展示本地音乐列表，支持点击播放。</p>
+ * <p>展示本地音乐列表，支持搜索和点击播放。</p>
  */
 public class SongsFragment extends Fragment {
 
     private ListView listView;
     private TextView countText;
+    private EditText searchEdit;
+    private ImageView clearSearchButton;
+    private View searchEmptyLayout;
     private LocalAudioAdapter adapter;
     private List<LocalAudioTrack> allTracks = new ArrayList<>();
     private OnTrackClickListener trackClickListener;
@@ -49,6 +56,9 @@ public class SongsFragment extends Fragment {
         
         listView = view.findViewById(R.id.list_songs);
         countText = view.findViewById(R.id.text_song_count);
+        searchEdit = view.findViewById(R.id.edit_search);
+        clearSearchButton = view.findViewById(R.id.image_clear_search);
+        searchEmptyLayout = view.findViewById(R.id.layout_search_empty);
         
         adapter = new LocalAudioAdapter(requireContext());
         listView.setAdapter(adapter);
@@ -59,6 +69,9 @@ public class SongsFragment extends Fragment {
                 trackClickListener.onTrackClick(track, position);
             }
         });
+        
+        // 设置搜索功能
+        setupSearch();
         
         // 更新显示
         updateDisplay();
@@ -92,6 +105,30 @@ public class SongsFragment extends Fragment {
     }
 
     /**
+     * 设置搜索功能。
+     */
+    private void setupSearch() {
+        searchEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString().trim();
+                clearSearchButton.setVisibility(query.isEmpty() ? View.GONE : View.VISIBLE);
+                filterTracks(query);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        clearSearchButton.setOnClickListener(v -> {
+            searchEdit.setText("");
+        });
+    }
+
+    /**
      * 过滤歌曲列表（搜索功能）。
      *
      * @param query 搜索关键词
@@ -99,6 +136,8 @@ public class SongsFragment extends Fragment {
     public void filterTracks(@NonNull String query) {
         if (query.isEmpty()) {
             adapter.submitList(allTracks);
+            listView.setVisibility(View.VISIBLE);
+            searchEmptyLayout.setVisibility(View.GONE);
         } else {
             List<LocalAudioTrack> filtered = new ArrayList<>();
             String lowerQuery = query.toLowerCase();
@@ -110,6 +149,15 @@ public class SongsFragment extends Fragment {
                 }
             }
             adapter.submitList(filtered);
+            
+            // 空结果提示
+            if (filtered.isEmpty()) {
+                listView.setVisibility(View.GONE);
+                searchEmptyLayout.setVisibility(View.VISIBLE);
+            } else {
+                listView.setVisibility(View.VISIBLE);
+                searchEmptyLayout.setVisibility(View.GONE);
+            }
         }
         updateCountDisplay();
     }

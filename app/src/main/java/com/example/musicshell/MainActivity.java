@@ -12,11 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,10 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private final LocalAudioScanner audioScanner = new LocalAudioScanner();
 
     private SharedPreferences preferences;
-    
-    // 搜索相关
-    private EditText searchEdit;
-    private ImageView clearSearchButton;
     
     // Fragment 相关
     private SongsFragment songsFragment;
@@ -120,9 +112,6 @@ public class MainActivity extends AppCompatActivity {
         
         // 设置底部导航
         setupBottomNavigation();
-        
-        // 设置搜索功能
-        setupSearch();
 
         // 检查协议
         if (!preferences.getBoolean(KEY_AGREEMENT_ACCEPTED, false)) {
@@ -164,8 +153,6 @@ public class MainActivity extends AppCompatActivity {
      * 初始化视图。
      */
     private void initViews() {
-        searchEdit = findViewById(R.id.edit_search);
-        clearSearchButton = findViewById(R.id.image_clear_search);
         bottomNavigation = findViewById(R.id.bottom_navigation);
         
         // 悬浮播放器
@@ -243,34 +230,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             return false;
-        });
-    }
-
-    /**
-     * 设置搜索功能。
-     */
-    private void setupSearch() {
-        searchEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s.toString().trim();
-                clearSearchButton.setVisibility(query.isEmpty() ? View.GONE : View.VISIBLE);
-                
-                // 过滤歌曲列表
-                if (songsFragment != null) {
-                    songsFragment.filterTracks(query);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-        
-        clearSearchButton.setOnClickListener(v -> {
-            searchEdit.setText("");
         });
     }
 

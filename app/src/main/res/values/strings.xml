@@ -60,4 +60,6 @@
     <string name="play_mode_repeat">列表循环</string>
     <string name="play_mode_repeat_one">单曲循环</string>
     <string name="play_mode_shuffle">随机播放</string>
+    <string name="search_no_result">未找到相关歌曲</string>
+    <string name="search_no_result_hint">试试其他关键词</string>
 </resources>
