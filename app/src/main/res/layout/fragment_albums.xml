@@ -16,6 +16,17 @@
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="?attr/colorOnSurfaceVariant" />
 
+    <!-- 空状态提示 -->
+    <TextView
+        android:id="@+id/text_album_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/no_albums"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
+
     <!-- 专辑网格 -->
     <GridView
         android:id="@+id/grid_albums"

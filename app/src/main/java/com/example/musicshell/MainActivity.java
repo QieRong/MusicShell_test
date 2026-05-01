@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.musicshell.media.LocalAudioScanner;
 import com.example.musicshell.media.LocalAudioTrack;
+import com.example.musicshell.media.MusicDataManager;
 import com.example.musicshell.media.PlaybackService;
 import com.example.musicshell.ui.AlbumsFragment;
 import com.example.musicshell.ui.ArtistsFragment;
@@ -306,6 +307,9 @@ public class MainActivity extends AppCompatActivity {
     private void onScanComplete(@NonNull List<LocalAudioTrack> tracks) {
         allTracks = tracks;
         
+        // 更新 MusicDataManager 数据
+        MusicDataManager.getInstance().updateTracks(tracks);
+        
         // 更新歌曲 Fragment
         if (songsFragment != null) {
             songsFragment.updateTracks(tracks);
@@ -313,12 +317,12 @@ public class MainActivity extends AppCompatActivity {
         
         // 更新专辑 Fragment
         if (albumsFragment != null) {
-            albumsFragment.updateTracks(tracks);
+            albumsFragment.updateDisplay();
         }
         
         // 更新歌手 Fragment
         if (artistsFragment != null) {
-            artistsFragment.updateTracks(tracks);
+            artistsFragment.updateDisplay();
         }
         
         // 设置播放列表到服务

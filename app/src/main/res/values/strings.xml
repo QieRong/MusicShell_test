@@ -51,4 +51,7 @@
     <string name="settings_theme_light">浅色模式</string>
     <string name="settings_theme_dark">深色模式</string>
     <string name="settings_about">关于</string>
+    <string name="no_albums">暂无本地专辑</string>
+    <string name="no_artists">暂无本地歌手</string>
+    <string name="artist_song_count_format">%1$d 首歌</string>
 </resources>
