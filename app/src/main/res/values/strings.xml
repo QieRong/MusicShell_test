@@ -29,4 +29,8 @@
     <string name="mini_player_default_artist">点击歌曲开始播放</string>
     <string name="playback_error">播放出错：%1$s</string>
     <string name="playback_error_title">播放错误</string>
+    <string name="notification_channel_name">音乐播放</string>
+    <string name="notification_channel_description">显示当前播放的音乐和控制按钮</string>
+    <string name="play">播放</string>
+    <string name="pause">暂停</string>
 </resources>
