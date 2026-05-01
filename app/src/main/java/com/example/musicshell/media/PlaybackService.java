@@ -183,6 +183,30 @@ public class PlaybackService extends Service implements MusicPlayerController.Pl
     }
 
     /**
+     * 设置播放模式。
+     *
+     * @param mode 播放模式
+     */
+    public void setPlayMode(@NonNull MusicPlayerController.PlayMode mode) {
+        if (playerController != null) {
+            playerController.setPlayMode(mode);
+        }
+    }
+
+    /**
+     * 获取当前播放模式。
+     *
+     * @return 当前播放模式
+     */
+    @NonNull
+    public MusicPlayerController.PlayMode getPlayMode() {
+        if (playerController != null) {
+            return playerController.getPlayMode();
+        }
+        return MusicPlayerController.PlayMode.REPEAT_ALL;
+    }
+
+    /**
      * 获取当前播放的歌曲。
      *
      * @return 当前歌曲，未播放时返回 null

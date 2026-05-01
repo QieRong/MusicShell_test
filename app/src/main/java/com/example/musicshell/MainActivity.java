@@ -28,6 +28,7 @@ import com.example.musicshell.media.MusicDataManager;
 import com.example.musicshell.media.PlaybackService;
 import com.example.musicshell.ui.AlbumsFragment;
 import com.example.musicshell.ui.ArtistsFragment;
+import com.example.musicshell.ui.FullScreenPlayerActivity;
 import com.example.musicshell.ui.SettingsFragment;
 import com.example.musicshell.ui.SongsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -181,6 +182,21 @@ public class MainActivity extends AppCompatActivity {
                 if (currentTrack != null) {
                     playbackService.playOrPause(currentTrack);
                     updateMiniPlayerUI();
+                }
+            }
+        });
+
+        // 迷你播放栏点击事件：打开全屏播放页
+        miniPlayerCard.setOnClickListener(v -> {
+            if (playbackService != null) {
+                LocalAudioTrack currentTrack = playbackService.getCurrentTrack();
+                if (currentTrack != null) {
+                    FullScreenPlayerActivity.start(
+                            this,
+                            currentTrack.getTitle(),
+                            currentTrack.getArtist(),
+                            currentTrack.getContentUri().toString()
+                    );
                 }
             }
         });

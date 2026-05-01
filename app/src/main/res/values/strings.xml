@@ -54,4 +54,10 @@
     <string name="no_albums">暂无本地专辑</string>
     <string name="no_artists">暂无本地歌手</string>
     <string name="artist_song_count_format">%1$d 首歌</string>
+    <string name="now_playing">正在播放</string>
+    <string name="back">返回</string>
+    <string name="play_mode">播放模式</string>
+    <string name="play_mode_repeat">列表循环</string>
+    <string name="play_mode_repeat_one">单曲循环</string>
+    <string name="play_mode_shuffle">随机播放</string>
 </resources>

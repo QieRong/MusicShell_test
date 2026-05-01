@@ -18,11 +18,23 @@ import java.util.List;
  * <p>基于系统 {@link MediaPlayer}，封装播放、暂停、切换歌曲等操作。
  * 使用 {@link MediaPlayer#prepareAsync()} 异步准备，避免阻塞 UI 线程。</p>
  *
- * <p>支持播放列表管理、上一首/下一首切换、进度查询与跳转。</p>
+ * <p>支持播放列表管理、上一首/下一首切换、进度查询与跳转、播放模式切换。</p>
  *
  * <p>生命周期：Activity 创建时初始化，onDestroy() 时必须调用 {@link #release()} 释放资源。</p>
  */
 public class MusicPlayerController {
+
+    /**
+     * 播放模式枚举。
+     */
+    public enum PlayMode {
+        /** 列表循环 */
+        REPEAT_ALL,
+        /** 单曲循环 */
+        REPEAT_ONE,
+        /** 随机播放 */
+        SHUFFLE
+    }
 
     /**
      * 播放状态回调接口。
@@ -55,6 +67,9 @@ public class MusicPlayerController {
     private List<LocalAudioTrack> playlist = new ArrayList<>();
     /** 当前播放索引，-1 表示无歌曲 */
     private int currentIndex = -1;
+    /** 当前播放模式 */
+    @NonNull
+    private PlayMode playMode = PlayMode.REPEAT_ALL;
 
     public MusicPlayerController(@NonNull Context context) {
         this.context = context.getApplicationContext();
@@ -81,6 +96,25 @@ public class MusicPlayerController {
         } else {
             this.currentIndex = -1;
         }
+    }
+
+    /**
+     * 设置播放模式。
+     *
+     * @param mode 播放模式
+     */
+    public void setPlayMode(@NonNull PlayMode mode) {
+        this.playMode = mode;
+    }
+
+    /**
+     * 获取当前播放模式。
+     *
+     * @return 当前播放模式
+     */
+    @NonNull
+    public PlayMode getPlayMode() {
+        return playMode;
     }
 
     /**
@@ -186,7 +220,10 @@ public class MusicPlayerController {
     /**
      * 播放下一首。
      *
-     * <p>边界处理：最后一首歌时循环到第一首。</p>
+     * <p>根据播放模式决定下一首：
+     * - REPEAT_ALL：最后一首循环到第一首
+     * - REPEAT_ONE：重新播放当前歌曲
+     * - SHUFFLE：随机选择下一首</p>
      */
     public void playNext() {
         if (playlist.isEmpty()) {
@@ -194,11 +231,33 @@ public class MusicPlayerController {
         }
 
         int newIndex;
-        if (currentIndex >= playlist.size() - 1) {
-            // 已是最后一首，循环到第一首
-            newIndex = 0;
-        } else {
-            newIndex = currentIndex + 1;
+
+        switch (playMode) {
+            case REPEAT_ONE:
+                // 单曲循环：重新播放当前歌曲
+                newIndex = currentIndex;
+                break;
+
+            case SHUFFLE:
+                // 随机播放：随机选择一首（排除当前歌曲）
+                if (playlist.size() == 1) {
+                    newIndex = 0;
+                } else {
+                    do {
+                        newIndex = (int) (Math.random() * playlist.size());
+                    } while (newIndex == currentIndex);
+                }
+                break;
+
+            case REPEAT_ALL:
+            default:
+                // 列表循环：最后一首循环到第一首
+                if (currentIndex >= playlist.size() - 1) {
+                    newIndex = 0;
+                } else {
+                    newIndex = currentIndex + 1;
+                }
+                break;
         }
 
         playAtIndex(newIndex);

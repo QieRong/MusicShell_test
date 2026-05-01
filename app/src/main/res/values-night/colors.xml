@@ -13,4 +13,7 @@
     <color name="musicshell_outline">#556159</color>
     <color name="player_highlight">#8BF7C2</color>
     <color name="item_title">#E2E8E2</color>
+    <color name="album_cover_placeholder">#2A2A2A</color>
+    <color name="player_background_light">#F5FBF6</color>
+    <color name="player_background_dark">#191C1A</color>
 </resources>

@@ -14,4 +14,6 @@
     <color name="player_highlight">#216F55</color>
     <color name="item_title">#171D1A</color>
     <color name="album_cover_placeholder">#E0E0E0</color>
+    <color name="player_background_light">#F5FBF6</color>
+    <color name="player_background_dark">#191C1A</color>
 </resources>

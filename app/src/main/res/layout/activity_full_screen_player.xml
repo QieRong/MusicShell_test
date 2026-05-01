@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- 顶部标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_back"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/back"
+            app:icon="@drawable/ic_arrow_back"
+            app:iconGravity="textStart"
+            app:iconSize="24dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/now_playing"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorOnSurface" />
+
+        <!-- 占位，保持标题居中 -->
+        <View
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
+    </LinearLayout>
+
+    <!-- 内容区域 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="32dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="32dp">
+
+            <!-- 封面大图 -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/image_album_cover"
+                android:layout_width="240dp"
+                android:layout_height="240dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:contentDescription="@string/album_cover"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/RoundedCornerImageView" />
+
+            <!-- 歌名 -->
+            <TextView
+                android:id="@+id/text_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="2"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textColor="?attr/colorOnSurface" />
+
+            <!-- 歌手 -->
+            <TextView
+                android:id="@+id/text_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <!-- 进度条区域 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:orientation="vertical">
+
+                <SeekBar
+                    android:id="@+id/seekbar_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="?attr/colorPrimary"
+                    android:thumbTint="?attr/colorPrimary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/text_current_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="0:00"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/text_total_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0:00"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 播放模式切换按钮 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_play_mode"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/play_mode"
+                app:icon="@drawable/ic_repeat"
+                app:iconGravity="textStart"
+                app:iconSize="24dp" />
+
+            <!-- 控制按钮区域 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!-- 上一首 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_previous"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:contentDescription="@string/previous_track"
+                    app:icon="@drawable/ic_skip_previous"
+                    app:iconGravity="textStart"
+                    app:iconSize="32dp" />
+
+                <!-- 播放/暂停 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_play_pause"
+                    style="@style/Widget.Material3.Button.IconButton.Filled"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:contentDescription="@string/play_pause"
+                    app:icon="@drawable/ic_play_arrow"
+                    app:iconGravity="textStart"
+                    app:iconSize="40dp" />
+
+                <!-- 下一首 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_next"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:contentDescription="@string/next_track"
+                    app:icon="@drawable/ic_skip_next"
+                    app:iconGravity="textStart"
+                    app:iconSize="32dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
