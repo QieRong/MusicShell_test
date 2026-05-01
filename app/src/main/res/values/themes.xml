@@ -15,4 +15,10 @@
         <item name="android:statusBarColor">@color/musicshell_surface</item>
         <item name="android:navigationBarColor">@color/musicshell_surface</item>
     </style>
+
+    <!-- 圆形图片样式 -->
+    <style name="CircleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

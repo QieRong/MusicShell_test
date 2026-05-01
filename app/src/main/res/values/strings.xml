@@ -33,4 +33,22 @@
     <string name="notification_channel_description">显示当前播放的音乐和控制按钮</string>
     <string name="play">播放</string>
     <string name="pause">暂停</string>
+    <string name="search">搜索</string>
+    <string name="search_hint">搜索本地音乐</string>
+    <string name="clear">清除</string>
+    <string name="nav_songs">歌曲</string>
+    <string name="nav_albums">专辑</string>
+    <string name="nav_artists">歌手</string>
+    <string name="nav_settings">设置</string>
+    <string name="album_cover">专辑封面</string>
+    <string name="artist_avatar">歌手头像</string>
+    <string name="song_count_format">%1$d 首歌曲</string>
+    <string name="album_count_format">%1$d 张专辑</string>
+    <string name="artist_count_format">%1$d 位歌手</string>
+    <string name="album_song_count_format">%1$d 首歌</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_theme_system">跟随系统</string>
+    <string name="settings_theme_light">浅色模式</string>
+    <string name="settings_theme_dark">深色模式</string>
+    <string name="settings_about">关于</string>
 </resources>

@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * 本地音频列表适配器。
+ * 本地音频列表适配器（两行布局）。
  *
- * <p>只展示歌名、歌手、专辑和时长，不展示文件路径。
+ * <p>第一行显示歌名，第二行显示歌手，右侧显示时长。
  * 支持点击事件回调和当前播放歌曲高亮。</p>
  */
 public class LocalAudioAdapter extends BaseAdapter {
@@ -73,9 +73,14 @@ public class LocalAudioAdapter extends BaseAdapter {
         }
     }
 
-    public void submitList(@NonNull List<LocalAudioTrack> nextTracks) {
+    /**
+     * 更新列表数据。
+     *
+     * @param newTracks 新的歌曲列表
+     */
+    public void submitList(@NonNull List<LocalAudioTrack> newTracks) {
         tracks.clear();
-        tracks.addAll(nextTracks);
+        tracks.addAll(newTracks);
         notifyDataSetChanged();
     }
 
@@ -99,7 +104,7 @@ public class LocalAudioAdapter extends BaseAdapter {
         ViewHolder holder;
         View itemView = convertView;
         if (itemView == null) {
-            itemView = inflater.inflate(R.layout.item_local_audio, parent, false);
+            itemView = inflater.inflate(R.layout.item_song, parent, false);
             holder = new ViewHolder(itemView);
             itemView.setTag(holder);
         } else {
@@ -107,8 +112,15 @@ public class LocalAudioAdapter extends BaseAdapter {
         }
 
         LocalAudioTrack track = getItem(position);
+        
+        // 设置歌名
         holder.titleText.setText(getDisplayTitle(track));
-        holder.metaText.setText(getMetaText(track));
+        
+        // 设置歌手名
+        holder.artistText.setText(getDisplayArtist(track));
+        
+        // 设置时长
+        holder.durationText.setText(formatDuration(track.getDurationMs()));
 
         // 高亮当前正在播放的歌曲
         boolean isCurrentPlaying = track.getId() == currentPlayingTrackId;
@@ -134,14 +146,11 @@ public class LocalAudioAdapter extends BaseAdapter {
     }
 
     @NonNull
-    private String getMetaText(@NonNull LocalAudioTrack track) {
-        String artist = TextUtils.isEmpty(track.getArtist())
-                ? context.getString(R.string.unknown_artist)
-                : track.getArtist();
-        String album = TextUtils.isEmpty(track.getAlbum())
-                ? context.getString(R.string.unknown_album)
-                : track.getAlbum();
-        return artist + " · " + album + " · " + formatDuration(track.getDurationMs());
+    private String getDisplayArtist(@NonNull LocalAudioTrack track) {
+        if (TextUtils.isEmpty(track.getArtist())) {
+            return context.getString(R.string.unknown_artist);
+        }
+        return track.getArtist();
     }
 
     @NonNull
@@ -154,11 +163,13 @@ public class LocalAudioAdapter extends BaseAdapter {
 
     private static class ViewHolder {
         final TextView titleText;
-        final TextView metaText;
+        final TextView artistText;
+        final TextView durationText;
 
         ViewHolder(@NonNull View itemView) {
-            titleText = itemView.findViewById(R.id.text_track_title);
-            metaText = itemView.findViewById(R.id.text_track_meta);
+            titleText = itemView.findViewById(R.id.text_song_title);
+            artistText = itemView.findViewById(R.id.text_song_artist);
+            durationText = itemView.findViewById(R.id.text_song_duration);
         }
     }
 }
